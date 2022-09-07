@@ -1,23 +1,8 @@
 //Variable Definitions & Dependencies
+require ('dotenv').config();
 const inquirer = require('inquirer');
+require("console.table");
 const db = require('./db/connection');
-
-//Import the connection object
-const sequelize = require('./config/connection');
-
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-//Connect to the database before starting the Express.js server
-sequelize.sync().then(() => {
-app.listen(PORT, () => console.log('Now listening'));
-});
-
-
-
 
 
 
@@ -33,87 +18,86 @@ var employee_tracker = function () {
         //User promts are
         type: 'list',
         name: 'prompt',
-        message: 'Please make a selection from the following choices:',
+        message: 'What would you like to do?',
         choices: 
         [
-          'View All Department', 
-          'View All Roles', 
-          'View All Employees', 
-          'Add A Department', 
-          'Add A Role', 
-          'Add An Employee', 
-          'Update An Employee Role', 
+          'View Departments', 
+          'View Job Roles', 
+          'View Employees', 
+          'Add a Department', 
+          'Add a Job Role', 
+          'Add an Employee', 
+          'Update a Job Role', 
           'Log Out'
         ]
     }]).then((answers) => {
         // Views the Department Table in the Database
-        if (answers.prompt === 'View All Department') {
+        if (answers.prompt === 'View Departments') {
             db.query(`SELECT * FROM department`, (err, result) => {
                 if (err) throw err;
-                console.log("Viewing All Departments: ");
+                console.log("Viewing Departments: ");
                 console.table(result);
                 employee_tracker();
             });
-        } else if (answers.prompt === 'View All Roles') {
+        } else if (answers.prompt === 'View Job Roles') {
             db.query(`SELECT * FROM role`, (err, result) => {
                 if (err) throw err;
                 console.log("Viewing All Roles: ");
                 console.table(result);
                 employee_tracker();
             });
-        } else if (answers.prompt === 'View All Employees') {
+        } else if (answers.prompt === 'View Employees') {
             db.query(`SELECT * FROM employee`, (err, result) => {
                 if (err) throw err;
-                console.log("Viewing All Employees: ");
+                console.log("Viewing Employees: ");
                 console.table(result);
                 employee_tracker();
             });
-        } else if (answers.prompt === 'Add A Department') {
+        } else if (answers.prompt === 'Add a Department') {
             inquirer.prompt([{
                 // Adding a Department
                 type: 'input',
                 name: 'department',
-                message: 'What is the name of the dpeartment?',
+                message: 'What is the name of the department?',
                 validate: departmentInput => {
                     if (departmentInput) {
                         return true;
                     } else {
-                        console.log('Please Add A Department!');
+                        console.log('Please add Department!');
                         return false;
                     }
                 }
             }]).then((answers) => {
-                db.query(`INSERT INTO department (name) VALUES (?)`, [answers.department], (err, result) => {
+                db.query(`INSERT INTO DEPARTMENT(dept_name)
+                values(?)`, answers.department, (err, result) => {
                     if (err) throw err;
                     console.log(`Added ${answers.department} to the database.`)
                     employee_tracker();
                 });
             })
-        } else if (answers.prompt === 'Add A Role') {
+        } else if (answers.prompt === 'Add a Job Role') {
             // Beginning with the database so that we may acquire the departments for the choice
             db.query(`SELECT * FROM department`, (err, result) => {
                 if (err) throw err;
-
                 inquirer.prompt([
                     {
-                        // Adding A Role
-                        type: 'input',
-                        name: 'role',
-                        message: 'What is the name of the role?',
-                        validate: roleInput => {
+                     //Adding A Role
+                      type: 'input',
+                      name: 'role',
+                      message: 'What is the job role?',
+                      validate: roleInput => {
                             if (roleInput) {
                                 return true;
                             } else {
-                                console.log('Please Add A Role!');
+                                console.log('Please Add A position!');
                                 return false;
                             }
                         }
                     },
-                    {
-                        // Adding the Salary
+                    {  //Adding the Salary
                         type: 'input',
                         name: 'salary',
-                        message: 'What is the salary of the role?',
+                        message: 'What is the salary of the postion?',
                         validate: salaryInput => {
                             if (salaryInput) {
                                 return true;
@@ -123,11 +107,10 @@ var employee_tracker = function () {
                             }
                         }
                     },
-                    {
-                        // Department
+                    {  //Department
                         type: 'list',
                         name: 'department',
-                        message: 'Which department does the role belong to?',
+                        message: 'What is the department location of the job role?',
                         choices: () => {
                             var array = [];
                             for (var i = 0; i < result.length; i++) {
@@ -143,7 +126,6 @@ var employee_tracker = function () {
                             var department = result[i];
                         }
                     }
-
                     db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answers.role, answers.salary, department.id], (err, result) => {
                         if (err) throw err;
                         console.log(`Added ${answers.role} to the database.`)
@@ -151,14 +133,13 @@ var employee_tracker = function () {
                     });
                 })
             });
-        } else if (answers.prompt === 'Add An Employee') {
-            // Calling the database to acquire the roles and managers
+        } else if (answers.prompt === 'Add an Employee') {
+            //Calling the database to acquire the roles and managers
             db.query(`SELECT * FROM employee, role`, (err, result) => {
                 if (err) throw err;
 
                 inquirer.prompt([
-                    {
-                        // Adding Employee First Name
+                    {//Adding Employee First Name
                         type: 'input',
                         name: 'firstName',
                         message: 'What is the employees first name?',
@@ -171,8 +152,7 @@ var employee_tracker = function () {
                             }
                         }
                     },
-                    {
-                        // Adding Employee Last Name
+                    {//Adding Employee Last Name
                         type: 'input',
                         name: 'lastName',
                         message: 'What is the employees last name?',
@@ -185,8 +165,7 @@ var employee_tracker = function () {
                             }
                         }
                     },
-                    {
-                        // Adding Employee Role
+                    {// Adding Employee Role
                         type: 'list',
                         name: 'role',
                         message: 'What is the employees role?',
@@ -199,8 +178,7 @@ var employee_tracker = function () {
                             return newArray;
                         }
                     },
-                    {
-                        // Adding Employee Manager
+                    {//Adding Employee Manager
                         type: 'input',
                         name: 'manager',
                         message: 'Who is the employees manager?',
@@ -214,13 +192,12 @@ var employee_tracker = function () {
                         }
                     }
                 ]).then((answers) => {
-                    // Comparing the result and storing it into the variable
+                    //Comparing the result and storing it into the variable
                     for (var i = 0; i < result.length; i++) {
                         if (result[i].title === answers.role) {
                             var role = result[i];
                         }
                     }
-
                     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answers.firstName, answers.lastName, role.id, answers.manager.id], (err, result) => {
                         if (err) throw err;
                         console.log(`Added ${answers.firstName} ${answers.lastName} to the database.`)
@@ -228,14 +205,13 @@ var employee_tracker = function () {
                     });
                 })
             });
-        } else if (answers.prompt === 'Update An Employee Role') {
-            // Calling the database to acquire the roles and managers
+        } else if (answers.prompt === 'Update a Job Role') {
+            //Calling the database to acquire the roles and managers
             db.query(`SELECT * FROM employee, role`, (err, result) => {
                 if (err) throw err;
 
                 inquirer.prompt([
-                    {
-                        // Choose an Employee to Update
+                    {//Choose an Employee to Update
                         type: 'list',
                         name: 'employee',
                         message: 'Which employees role do you want to update?',
@@ -248,8 +224,7 @@ var employee_tracker = function () {
                             return employeeArray;
                         }
                     },
-                    {
-                        // Updating the New Role
+                    {// Updating the New Role
                         type: 'list',
                         name: 'role',
                         message: 'What is their new role?',
@@ -269,13 +244,11 @@ var employee_tracker = function () {
                             var name = result[i];
                         }
                     }
-
                     for (var i = 0; i < result.length; i++) {
                         if (result[i].title === answers.role) {
                             var role = result[i];
                         }
                     }
-
                     db.query(`UPDATE employee SET ? WHERE ?`, [{role_id: role}, {last_name: name}], (err, result) => {
                         if (err) throw err;
                         console.log(`Updated ${answers.employee} role to the database.`)
@@ -285,7 +258,7 @@ var employee_tracker = function () {
             });
         } else if (answers.prompt === 'Log Out') {
             db.end();
-            console.log("Good-Bye!");
+            console.log("Exiting Employee Tracker");
         }
     })
 };
