@@ -4,7 +4,6 @@ INSERT INTO DEPARTMENT(dept_name)
 values('Sales'),('Marketing'),('IT');
 
 
-
 INSERT INTO ROLE (title,salary,department_id)
 values('Manager',12121,1),
 ('Manager',24232,2),
@@ -18,7 +17,7 @@ values('Manager',12121,1),
     ('John','Deer',2),
     ('Hally','Smartie',3);
     
- INSERT INTO EMPLOYEE(first_name,last_name,manager_id,role_id)values
+    INSERT INTO EMPLOYEE(first_name,last_name,manager_id,role_id)values
     ('Harry','Brat',1,4),
     ('Ophelia','Carr',2,5),
     ('Sayed','Song',3,6);   

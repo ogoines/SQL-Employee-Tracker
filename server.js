@@ -1,5 +1,5 @@
 //Variable Definitions & Dependencies
-require ('dotenv').config();
+require('dotenv').config();
 const inquirer = require('inquirer');
 require("console.table");
 const db = require('./db/connection');
@@ -19,17 +19,17 @@ var employee_tracker = function () {
         type: 'list',
         name: 'prompt',
         message: 'What would you like to do?',
-        choices: 
-        [
-          'View Departments', 
-          'View Job Roles', 
-          'View Employees', 
-          'Add a Department', 
-          'Add a Job Role', 
-          'Add an Employee', 
-          'Update a Job Role', 
-          'Log Out'
-        ]
+        choices:
+            [
+                'View Departments',
+                'View Job Roles',
+                'View Employees',
+                'Add a Department',
+                'Add a Job Role',
+                'Add an Employee',
+                'Update an Employee Role',
+                'Log Out'
+            ]
     }]).then((answers) => {
         // Views the Department Table in the Database
         if (answers.prompt === 'View Departments') {
@@ -81,15 +81,15 @@ var employee_tracker = function () {
                 if (err) throw err;
                 inquirer.prompt([
                     {
-                     //Adding A Role
-                      type: 'input',
-                      name: 'role',
-                      message: 'What is the job role?',
-                      validate: roleInput => {
+                        //Adding A Role
+                        type: 'input',
+                        name: 'role',
+                        message: 'What is the job role?',
+                        validate: roleInput => {
                             if (roleInput) {
                                 return true;
                             } else {
-                                console.log('Please Add A position!');
+                                console.log('Please Add a position!');
                                 return false;
                             }
                         }
@@ -205,7 +205,7 @@ var employee_tracker = function () {
                     });
                 })
             });
-        } else if (answers.prompt === 'Update a Job Role') {
+        } else if (answers.prompt === 'Update an Employee Role') {
             //Calling the database to acquire the roles and managers
             db.query(`SELECT * FROM employee, role`, (err, result) => {
                 if (err) throw err;
@@ -249,7 +249,7 @@ var employee_tracker = function () {
                             var role = result[i];
                         }
                     }
-                    db.query(`UPDATE employee SET ? WHERE ?`, [{role_id: role}, {last_name: name}], (err, result) => {
+                    db.query(`UPDATE employee SET ? WHERE ?`, [{ role_id: role }, { last_name: name }], (err, result) => {
                         if (err) throw err;
                         console.log(`Updated ${answers.employee} role to the database.`)
                         employee_tracker();
